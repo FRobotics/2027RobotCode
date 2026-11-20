@@ -1,4 +1,4 @@
-package frc.robot;
+/*package frc.robot;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class AutoSystem {
      * 
      * @param autoRun -String - The name of the auto routine to run.
      */
-    public static void ExecuteListInit(String autoRun ) {
+    /*public static void ExecuteListInit(String autoRun ) {
 
         // -------find our auto to run
         AutoRoutine autoToRun = null;
@@ -57,7 +57,7 @@ public class AutoSystem {
      * If a file ends in AUTO_FILE_EXTENSION it removes AUTO_FILE_EXTENSION from its name and adds it to autos
      * @return
      */
-    public static String[] availableAutos() {
+    /*public static String[] availableAutos() {
         List<String> autos = new ArrayList<String>();
         File[] files = AUTO_DIR.listFiles();
         if (files != null) {
@@ -75,7 +75,7 @@ public class AutoSystem {
      * @param files
      * @return
      */
-    public static String[] readFiles(String[] files){
+    /*public static String[] readFiles(String[] files){
         ArrayList<AutoRoutine> routines = new ArrayList<AutoRoutine>();
         ArrayList<String> routineNames = new ArrayList<String>();
         for (String fileInstance : files){
@@ -132,7 +132,7 @@ public class AutoSystem {
      * Finds the systems elapsed time, goes through the robots steps, and tests if the robot timed out.
      * @param SystemElapsedTime
      */
-    public static void ExecuteList(double SystemElapsedTime){
+    /*public static void ExecuteList(double SystemElapsedTime){
 
         // --------if our auto is null then, execute wait routine and return...
         if ( locExecRoutine == null ) {
@@ -231,7 +231,7 @@ public class AutoSystem {
                         }
                         else {locExecDoNextStep = false;
                         }*/
-                        break;
+                       /*  break;
                 
                 case Descend:
                         //SupervisoryCmds.ClimbRetract();
@@ -240,7 +240,7 @@ public class AutoSystem {
                         }
                         else {locExecDoNextStep = false;
                         }*/
-                        break;
+                 /*        break;
                 
                 case Defense:
                         //SupervisoryCmds.Defense();
@@ -282,7 +282,7 @@ public class AutoSystem {
      * one time init when robot boots up. Resets/starts timer and loads autos into chache.
      * @return
      */
-    public static String[] init() {
+    /*public static String[] init() {
 
         autoTimer.reset();
         autoTimer.start();
@@ -316,7 +316,7 @@ public class AutoSystem {
      * Returns getStep value
      * @return
      */
-    public static double getStep(){
+   /*  public static double getStep(){
         double returnGetStepValue = 0.0;
         if ( locExecRoutine != null ) {
                 returnGetStepValue =  (double)locExecRoutine.getStep(locExecIndex).getCmd().ordinal();
@@ -327,7 +327,7 @@ public class AutoSystem {
      * Returns getTimeout value
      * @return
      */
-    public static double getTimeout(){
+   /*  public static double getTimeout(){
         double returnGetTimeoutValue = 0.0;
         if (locExecRoutine != null){ 
         returnGetTimeoutValue = locExecRoutine.getStep(locExecIndex).getTimeout();
@@ -338,7 +338,7 @@ public class AutoSystem {
      * Returns getParm1 value
      * @return
      */
-    public static double getParm1(){
+  /*   public static double getParm1(){
         double returnGetParm1Value = 0.0;
         if (locExecRoutine != null){
                 returnGetParm1Value = locExecRoutine.getStep(locExecIndex).getParam1();
@@ -349,7 +349,7 @@ public class AutoSystem {
      * Returns getParm2 value
      * @return
      */
-    public static double getParm2(){
+   /*  public static double getParm2(){
         double returnGetParm2Value = 0.0;
         if (locExecRoutine != null){
                 returnGetParm2Value = locExecRoutine.getStep(locExecIndex).getParam2();
@@ -360,7 +360,7 @@ public class AutoSystem {
      * Returns getParm3 value
      * @return
      */
-    public static double getParm3(){
+   /*  public static double getParm3(){
         double returnGetParm3Value = 0.0;
         if (locExecRoutine != null){
                 returnGetParm3Value = locExecRoutine.getStep(locExecIndex).getParam3();
@@ -371,7 +371,7 @@ public class AutoSystem {
      * Returns getFunction string value.
      * @return
      */
-    public static String getFunction(){
+  /*   public static String getFunction(){
         String returnGetFunctionValue = "";
         if (locExecRoutine != null){
                 returnGetFunctionValue = locExecRoutine.getStep(locExecIndex).getFunction();
@@ -387,4 +387,4 @@ public class AutoSystem {
     //    locNTSend.triggerUpdate();
     //}
 
-}
+} */

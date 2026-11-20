@@ -86,7 +86,7 @@ public class SwerveDrive {
         sender.addItemDouble("omegaActual", SwerveDrive::getActualOmega);
 
         // --------module 1
-        sender.addItemDouble( "1/driveSpeedDmd", SwerveDrive.module1::getDriveSpeedDmd);
+       /*  sender.addItemDouble( "1/driveSpeedDmd", SwerveDrive.module1::getDriveSpeedDmd);
         sender.addItemDouble( "1/driveSpeed", SwerveDrive.module1::getDriveSpeed);
         sender.addItemDouble( "1/driveMotorOut", SwerveDrive.module1::getDriveMotorOutput);
         sender.addItemDouble( "1/spinPosDmdDeg", SwerveDrive.module1::getSpinPosDmdDeg);
@@ -115,7 +115,7 @@ public class SwerveDrive {
         sender.addItemDouble( "4/driveMotorOut", SwerveDrive.module4::getDriveMotorOutput);
         sender.addItemDouble( "4/spinPosDmdDeg", SwerveDrive.module4::getSpinPosDmdDeg);
         sender.addItemDouble( "4/spinPosDeg", SwerveDrive.module4::getSpinPosDeg);
-        sender.addItemDouble( "4/spinMotorOut", SwerveDrive.module4::getSpinMotorOutput);
+        sender.addItemDouble( "4/spinMotorOut", SwerveDrive.module4::getSpinMotorOutput);*/
 
         
     }

@@ -1,4 +1,4 @@
-package frc.robot;
+/*package frc.robot;
 
 import Lib4150.Lib4150PositionControl;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -47,7 +47,7 @@ public class AutoFunctions {
     // --------constructors
     private AutoFunctions(){
 
-    }
+    }*/
 
     /**
      * Wait a number of seconds.  Sets the drive demand to zero.  The time out
@@ -56,12 +56,12 @@ public class AutoFunctions {
      * 
      * @return - cmdDone - boolean - returns TRUE if command is done.  This function always returns FALSE.
      */
-    public static boolean autoWait()
+   /*  public static boolean autoWait()
     {
         //set drive demand to zero. is this the right method?
         SwerveDrive.setDesiredSpeed( DRIVE_OFF );
         return false;
-    }
+    }*/
 
     // ---------------------------------------------------------------------------------------------
     /**
@@ -76,7 +76,7 @@ public class AutoFunctions {
      * 
      * @return - cmdDone - boolean - returns TRUE if command is done.
      */
-    static public boolean autoDriveSpin(boolean autoInitStep, double degreesToTurn, double maxVelocity_DegPerSec ) {
+    /*static public boolean autoDriveSpin(boolean autoInitStep, double degreesToTurn, double maxVelocity_DegPerSec ) {
 
         boolean retValue = false;
 
@@ -122,7 +122,7 @@ public class AutoFunctions {
      * 
      * @return nextStep - boolean - if TRUE, go to next step.
      */
-    static public boolean autoDriveStraight(boolean autoInitStep, double metersToDrive, double maxVelocity_metersPerSec, double angleToDrive_Deg ) {
+    /*static public boolean autoDriveStraight(boolean autoInitStep, double metersToDrive, double maxVelocity_metersPerSec, double angleToDrive_Deg ) {
 
 
         boolean retValue = false;
@@ -173,7 +173,7 @@ public class AutoFunctions {
      * 
      * @return distance - double - traveled distance - meters
      */
-    static private double DriveStraightCalcTraveledDist( boolean init, double angleToDrive_Deg ) {
+    /*static private double DriveStraightCalcTraveledDist( boolean init, double angleToDrive_Deg ) {
 
         double totalDistanceM = 0.0;
 
@@ -235,4 +235,5 @@ public class AutoFunctions {
     }
     
 }
+*/
 

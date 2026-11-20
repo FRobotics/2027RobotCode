@@ -1,0 +1,266 @@
+package frc.robot;
+
+
+
+import Lib4150.Lib4150NetTableSystemSend;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+
+public class SwerveTeleop {
+   
+    private static XboxController myXboxController;
+    private static XboxController myXboxController2;
+    private static GenericHID locAuxButtonBox;
+    private static ChassisSpeeds myChassisSpeeds;
+    private static double YIn=0.0;
+    private static double XIn=0.0;
+    private static double RotIn=0.0;
+    //measured in feet
+   // private static final double motorOffsetTotal=(Math.sqrt(Math.pow(motorOffsetX, 2) + Math.pow(motorOffsetY, 2)))/12;
+    //private static final double circumfrence=2*Math.PI*motorOffsetTotal;
+    //private static final double realRotSpeed = maxLinearSpeed/circumfrence * 360;
+    // true is field orient false is robot orient
+    private static boolean orient = true; //true is field false is robot oriented
+    private static double exeTime=0.0;
+    private static double endTime=0.0;
+    private static double lastStartTime=0.0;
+    private static double periodicTime=0.0;
+    private static double startTime=0.0;
+    private static boolean leftStickPressed = false;
+    private static boolean leftStickButtonPressed;
+
+    private static Lib4150NetTableSystemSend locNTsend;
+
+    private SwerveTeleop(){
+
+    }
+    
+    public static void init() {
+        myXboxController = new XboxController(0);
+        myXboxController2 = new XboxController(1);
+        locAuxButtonBox = new GenericHID(2);
+        myChassisSpeeds = new ChassisSpeeds(0,0,0);
+
+        // TODO: add aux button box - if you want one.
+
+        locNTsend = new Lib4150NetTableSystemSend("Teleop");
+        locNTsend.addItemDouble("DriveSpeedTarg_X", SwerveTeleop::getDriveSpeedTargX);
+        locNTsend.addItemDouble("DriveSpeedTarg_Y", SwerveTeleop::getDriveSpeedTargY);
+        locNTsend.addItemDouble("DriveSpeedTarg_Rot", SwerveTeleop::getDriveSpeedTargRot);
+        locNTsend.addItemBoolean("FieldOriented", SwerveTeleop::getFieldOrientedDriving); 
+        locNTsend.triggerUpdate();
+        
+    }
+    
+    public static void SwerveExecute(){
+        
+        //start time --- only for diagnostices !!!
+        startTime = Timer.getFPGATimestamp();
+        periodicTime = (startTime - lastStartTime)*1000;
+        lastStartTime = startTime;
+
+        // --------read joysticks
+        YIn=myXboxController.getLeftX();
+        XIn=myXboxController.getLeftY();  //reverses the x and y
+        RotIn=myXboxController.getRightX();
+        if (myXboxController.getLeftStickButtonPressed()){
+            orient= !orient;
+        }
+
+        // --------apply deadband to joystick....
+        YIn=MathUtil.applyDeadband(YIn,.05);
+        XIn=MathUtil.applyDeadband(XIn,.05);
+        RotIn=MathUtil.applyDeadband(RotIn,.05);
+
+        //---------Square Values at 1, 0, and -1
+        YIn = YIn * YIn * Math.signum(YIn);
+        XIn = XIn * XIn * Math.signum(XIn);
+        RotIn = RotIn * RotIn * Math.signum(RotIn);
+
+        //--------Changes values to Ft and degrees
+        double YInFT = YIn * SwerveDrive.maxLinearSpeed;
+        double XInFT = XIn * SwerveDrive.maxLinearSpeed;
+        double RotInDeg = RotIn * SwerveDrive.maxRotSpeed;
+
+        //------Converts the X, Y, and Rotation values in new units
+        //switcheed X and Y to negative
+        myChassisSpeeds.vxMetersPerSecond = Units.feetToMeters(-XInFT);
+        myChassisSpeeds.vyMetersPerSecond = Units.feetToMeters(-YInFT);
+        myChassisSpeeds.omegaRadiansPerSecond = Units.degreesToRadians(-RotInDeg);
+
+        if (orient) {
+            if ( MatchSystem.isRed() ) {
+                myChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(myChassisSpeeds, new Rotation2d(SwerveOdometry.getrotposition()).plus(Rotation2d.k180deg));
+            }
+            else {
+                myChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(myChassisSpeeds, new Rotation2d(SwerveOdometry.getrotposition()));
+            }
+        }
+
+        //-----tell drive system our desired speed
+        SwerveDrive.setDesiredSpeed(myChassisSpeeds);
+
+        // ==============================================================================
+        //------- Second controller buttons
+       /*  if (myXboxController2.getAButtonPressed()){
+            SupervisoryCmds.Collecting();
+        }
+        if (myXboxController2.getBButtonPressed()){
+            SupervisoryCmds.StopAction();
+        }
+        if(myXboxController2.getLeftBumperButtonPressed()){
+            SupervisoryCmds.Shooting();
+        }
+        if (myXboxController2.getRightBumperButtonPressed()){
+            SupervisoryCmds.BallsToAlliance();
+        }
+        // if (myXboxController2.getYButton()){
+        //     SupervisoryCmds.ClimbRetract();
+        // }
+       
+        if (myXboxController2.getRightStickButtonPressed()){
+            SupervisoryCmds.Defense();
+        }
+        if (myXboxController2.getXButtonPressed()){
+            AgitatorSystem.cmdAgitatorReverse();
+        }
+        if (myXboxController2.getYButtonPressed()){
+            AgitatorSystem.cmdAgitatorForward();
+        }
+        // --------process rock
+        leftStickButtonPressed = myXboxController2.getLeftStickButtonPressed();
+
+        if (leftStickButtonPressed && !leftStickPressed){
+            IntakeSystem.cmdRockEnable();
+            leftStickPressed = true;
+        } else if (leftStickButtonPressed && leftStickPressed){
+            IntakeSystem.cmdRockDisable();
+            leftStickPressed = false;
+        }
+        // --------toggle turret manual mode.
+        if ( myXboxController2.getBackButtonPressed()) {
+            // --------in manual, set auto
+            if ( TurretLauncher.getTurretManualMode() ) {
+                TurretLauncher.cmdTurretAutoMode();
+            }
+            // --------in auto, set manual
+            else {
+                TurretLauncher.cmdTurretManualMode();
+            }
+        }
+
+        if (myXboxController2.getRightTriggerAxis()>=.8){
+            SupervisoryCmds.RevShooter();
+        }
+
+        // --------turret manual inc/dec
+        // --------This is approx 50 deg/second at maximum joystick value.
+        if ( TurretLauncher.getTurretManualMode()) {
+            TurretLauncher.cmdTurretIncDecManualSetpoint( -MathUtil.applyDeadband(myXboxController.getRightX(),0.10) * 3.0 );
+        }
+
+
+        // --------toggle launcher manual mode.
+        if ( myXboxController2.getStartButtonPressed()) {
+            // --------in manual, set auto
+            if ( TurretLauncher.getLauncherManualMode() ) {
+                TurretLauncher.cmdLauncherAutoMode();
+            }
+            // --------in auto, set manual
+            else {
+                TurretLauncher.cmdLauncherManualMode();
+            }
+        }
+
+        // --------launcher manual inc/dec
+        // --------This is approx 200 rpm/second at maximum joystick value.
+        if ( TurretLauncher.getLauncherManualMode()) {
+            TurretLauncher.cmdLauncherIncDecManualSetpoint( -MathUtil.applyDeadband(myXboxController2.getLeftY(),0.08) * 4.0 );
+        }*/
+
+        // ==============================================================================
+        //------- Third controller - aux button box.
+
+        // --------button indexes start at one
+
+        // --------SOMETHING 1
+        // if ( locAuxButtonBox.getRawButton(2)) {
+        //     SupervisoryCmds.ClimbExtend();
+        // }
+ 
+        // // --------SOMETHING 2
+        // if ( locAuxButtonBox.getRawButton(3)) {
+        //     SupervisoryCmds.ClimbRetract();
+        
+
+        // --------SOMETHING 3
+       /*  if ( locAuxButtonBox.getRawButtonPressed(4)) {
+            SupervisoryCmds.StopAction();
+        }
+ 
+        // --------SOMETHING 4
+        if ( locAuxButtonBox.getRawButtonPressed(5)) {
+            SupervisoryCmds.Defense();
+        }
+
+        // --------SOMETHING 5
+        if ( locAuxButtonBox.getRawButtonPressed(12)) {
+            SupervisoryCmds.Collecting();
+        }
+ 
+        // --------SOMETHING 6
+        if ( locAuxButtonBox.getRawButtonPressed(13)) {
+            SupervisoryCmds.Shooting();
+        }
+
+        // --------SOMETHING 7
+        if ( locAuxButtonBox.getRawButtonPressed(14)) {
+            SupervisoryCmds.BallsToAlliance();
+        }
+ 
+        // --------SOMETHING 8
+        if ( locAuxButtonBox.getRawButtonPressed(8)) {
+
+        }I*/
+
+        // ========
+        // --------generic end code.
+        endTime = Timer.getFPGATimestamp();
+        exeTime = (endTime-startTime)*1000;
+
+        // --------Tell system teleop is running
+        MatchSystem.setRobotPhaseTeleopRunning();
+        
+        locNTsend.triggerUpdate();
+
+        return;
+    }
+
+    public static boolean getFieldOrientedDriving(){
+        return(orient);
+    }
+
+    public static double getTeleopElapsedTimeMilli(){
+        return(exeTime);
+    }
+
+    public static double getTeleopPeriodicTimeMilli(){
+        return(periodicTime);
+    }
+
+    public static double getDriveSpeedTargX() {
+        return myChassisSpeeds.vxMetersPerSecond; 
+    }
+    public static double getDriveSpeedTargY() {
+        return myChassisSpeeds.vyMetersPerSecond; 
+    }
+    public static double getDriveSpeedTargRot() {
+        return myChassisSpeeds.omegaRadiansPerSecond; 
+    }
+
+}
